@@ -1,0 +1,205 @@
+basePath: /
+definitions:
+  http.ThreadCreateRequest:
+    properties:
+      community_id:
+        type: string
+      content:
+        type: string
+      parent_id:
+        type: string
+      user_id:
+        type: string
+    required:
+    - content
+    - user_id
+    type: object
+  http.ThreadJSON:
+    properties:
+      comment_count:
+        type: integer
+      community_id:
+        type: string
+      content:
+        type: string
+      created_at:
+        $ref: '#/definitions/http.TimeJSON'
+      id:
+        type: string
+      is_pinned:
+        type: boolean
+      like_count:
+        type: integer
+      repost_id:
+        type: string
+      share_count:
+        type: integer
+      updated_at:
+        $ref: '#/definitions/http.TimeJSON'
+      user_id:
+        type: string
+      view_count:
+        type: integer
+    type: object
+  http.TimeJSON:
+    properties:
+      day:
+        type: integer
+      hour:
+        type: integer
+      minute:
+        type: integer
+      month:
+        type: integer
+      second:
+        type: integer
+      timezone:
+        type: string
+      year:
+        type: integer
+    type: object
+  http.UpdateThreadRequest:
+    properties:
+      community_id:
+        type: string
+      content:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is my API.
+  title: My API
+  version: "1.0"
+paths:
+  /api/v1/threads:
+    post:
+      consumes:
+      - application/json
+      description: Create a thread with user ID, content, and optional parent/community
+      parameters:
+      - description: Thread content
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.ThreadCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new thread
+      tags:
+      - thread
+  /api/v1/threads/{id}:
+    delete:
+      description: Delete a thread using its unique ID
+      parameters:
+      - description: Thread ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a thread by ID
+      tags:
+      - thread
+    get:
+      description: Retrieve a single thread using its unique ID
+      parameters:
+      - description: Thread ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.ThreadJSON'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a thread by ID
+      tags:
+      - thread
+    put:
+      consumes:
+      - application/json
+      description: Update the content and/or community of an existing thread by its
+        unique ID
+      parameters:
+      - description: Thread ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated content and/or community ID
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/http.UpdateThreadRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a thread by ID
+      tags:
+      - thread
+swagger: "2.0"

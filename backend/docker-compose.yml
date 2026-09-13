@@ -1,0 +1,363 @@
+version: "3.8"
+
+networks:
+  ay_network:
+
+volumes:
+  auth_pgdata:
+  user_pgdata:
+  media_pgdata:
+  thread_pgdata:
+  community_pgdata:
+  chat_pgdata:
+
+services:
+  postgres-auth:
+    image: postgres:17.4
+    container_name: ay_postgres_auth
+    restart: always
+    environment:
+      POSTGRES_USER: authuser
+      POSTGRES_PASSWORD: authpass
+      POSTGRES_DB: authdb
+    volumes:
+      - auth_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - ay_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U authuser -d authdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  postgres-user:
+    image: postgres:17.4
+    container_name: ay_postgres_user
+    restart: always
+    environment:
+      POSTGRES_USER: useruser
+      POSTGRES_PASSWORD: userpass
+      POSTGRES_DB: userdb
+    volumes:
+      - user_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - ay_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U useruser -d userdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  postgres-media:
+    image: supabase/postgres:15.8.1.078
+    container_name: ay_postgres_media
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "mediapass"
+    volumes:
+      - media_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    networks:
+      - ay_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  postgres-thread:
+    image: postgres:17.4
+    container_name: ay_postgres_thread
+    restart: always
+    environment:
+      POSTGRES_USER: threaduser
+      POSTGRES_PASSWORD: threadpass
+      POSTGRES_DB: threaddb
+    volumes:
+      - thread_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+    networks:
+      - ay_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U threaduser -d threaddb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+  postgres-community:
+    image: postgres:17.4
+    container_name: ay_postgres_community
+    restart: always
+    environment:
+      POSTGRES_USER: communityuser
+      POSTGRES_PASSWORD: communitypass
+      POSTGRES_DB: communitydb
+    volumes:
+      - community_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5437:5432"
+    networks:
+      - ay_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U communityuser -d communitydb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  postgres-chat:
+    image: postgres:17.4
+    container_name: ay_postgres_chat
+    restart: always
+    environment:
+      POSTGRES_USER: chatuser
+      POSTGRES_PASSWORD: chatpass
+      POSTGRES_DB: chatdb
+    volumes:
+      - chat_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5438:5432"
+    networks:
+      - ay_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chatuser -d chatdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: ay_rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: mquser
+      RABBITMQ_DEFAULT_PASS: mqpass
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - ay_network
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmqctl status || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7
+    container_name: ay_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - ay_network
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  auth:
+    build:
+      context: .
+      dockerfile: services/auth/Dockerfile
+    container_name: ay_auth
+    restart: on-failure
+    depends_on:
+      - postgres-auth
+      - rabbitmq
+      - redis
+    environment:
+      DB_URL: "postgres://authuser:authpass@postgres-auth:5432/authdb"
+      MQ_URL: "amqp://mquser:mqpass@rabbitmq:5672/"
+      REDIS_URL: "redis://ay_redis:6379"
+      JWT_SECRET: "your_jwt_secret"
+      REFRESH_SECRET: "your_refresh_secret"
+      SMTP_HOST: "smtp.gmail.com"
+      SMTP_PORT: "587"
+      SMTP_USER: "william.sebastian.liman@gmail.com"
+      SMTP_PASS: "wvrw wmet yvwx dycd"
+      SMTP_FROM: "william.sebastian.liman@gmail.com"
+    ports:
+      - "50051:50051"
+    networks:
+      - ay_network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 50051 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  user:
+    build:
+      context: .
+      dockerfile: services/user/Dockerfile
+    container_name: ay_user
+    restart: on-failure
+    depends_on:
+      - postgres-user
+      - rabbitmq
+      - redis
+    environment:
+      DB_URL: "postgres://useruser:userpass@postgres-user:5432/userdb?sslmode=disable"
+      MQ_URL: "amqp://mquser:mqpass@rabbitmq:5672/"
+      REDIS_URL: "redis://ay_redis:6379"
+    ports:
+      - "50052:50051"
+    networks:
+      - ay_network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 50051 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  media:
+    build:
+      context: .
+      dockerfile: services/media/Dockerfile
+    container_name: ay_media
+    restart: on-failure
+    depends_on:
+      - postgres-media
+    environment:
+      DB_URL: "postgres://postgres:mediapass@postgres-media:5432/postgres?sslmode=disable"
+      MEDIA_SVC_ADDR: "media:50051"
+    ports:
+      - "50053:50051"
+    networks:
+      - ay_network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 50051 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  thread:
+    build:
+      context: .
+      dockerfile: services/thread/Dockerfile
+    container_name: ay_thread
+    restart: on-failure
+    depends_on:
+      - postgres-thread
+    environment:
+      DB_URL: "postgres://threaduser:threadpass@postgres-thread:5432/threaddb?sslmode=disable"
+    ports:
+      - "50054:50051"
+    networks:
+      - ay_network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 50051 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  chat:
+    build:
+      context: .
+      dockerfile: services/chat/Dockerfile
+    container_name: ay_chat
+    restart: on-failure
+    depends_on:
+      - postgres-chat
+    environment:
+      DB_URL: "postgres://chatuser:chatpass@postgres-chat:5432/chatdb?sslmode=disable"
+    ports:
+      - "50057:50051"
+    networks:
+      - ay_network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 50051 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  community:
+    build:
+      context: .
+      dockerfile: services/community/Dockerfile
+    container_name: ay_community
+    restart: on-failure
+    depends_on:
+      - postgres-community
+    environment:
+      DB_URL: "postgres://communityuser:communitypass@postgres-community:5432/communitydb?sslmode=disable"
+    ports:
+      - "50056:50051"
+    networks:
+      - ay_network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 50051 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  flask:
+    build:
+      context: ./flask
+      dockerfile: Dockerfile
+    container_name: ay_flask
+    restart: on-failure
+    networks:
+      - ay_network
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'curl -f http://localhost:5000/predict -d ''{"text":"ping"}'' -H ''Content-Type: application/json'' || exit 1',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: ay_api-gateway
+    restart: on-failure
+    depends_on:
+      - auth
+      - user
+      - redis
+      - rabbitmq
+      - media
+      - thread
+      - chat
+    environment:
+      HTTP_PORT: "8080"
+      AUTH_SVC_ADDR: "auth:50051"
+      USER_SVC_ADDR: "user:50051"
+      MEDIA_SVC_ADDR: "media:50051"
+      THREAD_SVC_ADDR: "thread:50051"
+      COMMUNITY_SVC_ADDR: "community:50051"
+      CHAT_SVC_ADDR: "chat:50051"
+      ML_SVC_ADDR: "flask:5000"
+      POSTGREST_URL: "https://itmuqguefzemfzsbryad.supabase.co/rest/v1"
+      ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0bXVxZ3VlZnplbWZ6c2JyeWFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1NjIzNDQsImV4cCI6MjA2MTEzODM0NH0.K2Hiz9uXWk2YZoI7UlbD4ZWzmvnFGuRcM5agWqS6-HQ"
+      SERVICE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0bXVxZnplbWZ6c2JyeWFkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTU2MjM0NCwiZXhwIjoyMDYxMTM4MzQ0fQ.f6THbFc5nUUp-ofyuWG8ga506t58Y6saVDo8QWDlku8"
+      PGRST_JWT_SECRET: "lPlf7yKAft02+YSoDpwZrX7dzmBPy9PYUdcb0NwCV1MjKiiw63hmQgTPLXGJ8Cq+L6Dqqznd4SjxbUY20t7gHQ=="
+    ports:
+      - "8080:8080"
+    networks:
+      - ay_network

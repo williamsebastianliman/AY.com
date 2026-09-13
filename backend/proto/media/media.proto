@@ -1,0 +1,32 @@
+syntax = "proto3";
+package media.v1;
+
+option go_package = "./";
+
+message MediaUploadRequest{
+    string filename = 1;
+    bytes file = 2;
+}
+
+message MediaUploadResponse{
+    string id = 1;
+    string public_url = 2;
+    string extension = 3;
+    string created_at = 4;
+}
+
+message GetMediaByIdRequest{
+    string id = 1;
+}
+
+message GetMediaByIdResponse{
+    string id = 1;
+    string public_url = 2;
+    string extension = 3;
+    string created_at = 4; 
+}
+
+service MediaService{
+    rpc Upload(MediaUploadRequest) returns (MediaUploadResponse);
+    rpc GetMediaById(GetMediaByIdRequest) returns (GetMediaByIdResponse);
+}

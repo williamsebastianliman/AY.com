@@ -1,0 +1,321 @@
+syntax = "proto3";
+
+package userpb;
+
+option go_package = "github.com/williamsebastianliman/WEB-WS-242/proto/gen/go/userpb;userpb";
+
+message RegisterUserRequest {
+  string name               = 1;
+  string username           = 2;
+  string email              = 3;
+  string password           = 4;
+  string gender             = 5;
+  string birth_year         = 6;
+  string birth_month        = 7;
+  string birth_day          = 8;
+  bool   subscribed_news    = 9;
+  string profile_picture_id = 10;
+  string banner_media_id    = 11;
+}
+
+message RegisterUserResponse {
+  string id = 1;
+}
+
+message UsernameValidationRequest {
+  string username = 1;
+}
+
+message UsernameValidationResponse {
+  bool is_unique = 1;
+}
+
+message GetUserByUsernameRequest {
+  string username = 1;
+}
+
+message GetUserByUsernameResponse {
+  string id                  = 1;
+  string name                = 2;
+  string username            = 3;
+  string email               = 4;
+  string gender              = 5;
+  string birth_year          = 6;
+  string birth_month         = 7;
+  string birth_day           = 8;
+  bool   subscribed_news     = 9;
+  string profile_picture_id  = 10;
+  string banner_media_id     = 11;
+  string password            = 12;
+  bool is_banned = 13;
+}
+
+message GetUserByNameResponse{
+  repeated UserInfo users = 1;
+}
+message UserInfo {
+  string id = 1;
+  string username = 2;
+  string name = 3;
+  string profile_picture_id = 4;
+}
+
+message GetUserByIdRequest {
+  string id = 1;
+}
+
+message FollowUserRequest {
+  string user_id     = 1;
+  string follower_id = 2;
+}
+
+message FollowUserResponse {
+  bool success = 1;
+}
+message UnfollowUserRequest {
+  string user_id     = 1;
+  string follower_id = 2;
+}
+
+message UnfollowUserResponse {
+  bool success = 1;
+}
+
+message GetFollowersRequest {
+  string user_id = 1;
+}
+message GetFollowersResponse {
+  repeated UserInfo followers = 1;
+}
+
+message GetFollowingRequest {
+  string user_id = 1;
+}
+
+
+
+message GetFollowingResponse {
+  repeated UserInfo following = 1;
+}
+
+message GetUserByIdResponse {
+  string id                  = 1;
+  string name                = 2;
+  string username            = 3;
+  string email               = 4;
+  string gender              = 5;
+  string birth_year          = 6;
+  string birth_month         = 7;
+  string birth_day           = 8;
+  bool   subscribed_news     = 9;
+  string profile_picture_id  = 10;
+  string banner_media_id     = 11;
+  string password            = 12;
+  string role = 13;
+  bool is_premium = 14;
+}
+
+message GetMeRequest {}
+
+message GetMeResponse {
+  string id                  = 1;
+  string name                = 2;
+  string username            = 3;
+  string email               = 4;
+  string gender              = 5;
+  string birth_year          = 6;
+  string birth_month         = 7;
+  string birth_day           = 8;
+  bool   subscribed_news     = 9;
+  string profile_picture_id  = 10;
+  string banner_media_id     = 11;
+}
+
+message CountResponse {
+  int64 count = 1;
+}
+
+message GetFollowStatusRequest {
+  string user_id = 1;
+  string follower_id = 2;
+}
+message IsFollowedResponse {
+  bool is_followed = 1;
+}
+
+message BlockUserRequest {
+  string user_id = 1;
+  string target_id = 2;
+}
+
+message BlockUserResponse {
+  bool success = 1;
+}
+
+message UnblockUserRequest {
+  string user_id = 1;
+  string target_id = 2;
+}
+
+message UnblockUserResponse {
+  bool success = 1;
+}
+
+message IsUserBlockedRequest {
+  string user_id = 1;
+  string target_id = 2;
+}
+
+message IsUserBlockedResponse {
+  bool is_blocked = 1;
+}
+
+message RequestPremiumRequest {
+  string user_id     = 1;
+  string card_number = 2;
+  string reason      = 3;
+  string face_image  = 4;
+}
+
+message RequestPremiumResponse {
+  bool success = 1;
+}
+
+message IsPremiumRequest {
+  string user_id = 1;
+}
+message PremiumRequestInfo {
+  string user_id    = 1;
+  string card_number = 2;
+  string reason     = 3;
+  string face_image = 4;
+}
+
+message GetAllPremiumRequestsRequest {}
+
+message GetAllPremiumRequestsResponse {
+  repeated PremiumRequest requests = 1;
+}
+
+message PremiumRequest{
+  string user_id = 1;
+  string card_number = 2;
+  string reason = 3;
+  string face_image = 4;
+}
+
+message AcceptPremiumRequest {
+  string user_id = 1;
+}
+
+message AcceptPremiumResponse {
+  bool success = 1;
+}
+
+message RejectPremiumRequest {
+  string user_id = 1;
+}
+
+message RejectPremiumResponse {
+  bool success = 1;
+}
+
+message UpdateProfileRequest {
+  string user_id             = 1;
+  string name                = 2;
+  string username            = 3;
+  string email               = 4;
+  string password            = 5;
+  string gender              = 6;
+  string birth_year          = 7;
+  string birth_month         = 8;
+  string birth_day           = 9;
+  string profile_picture_id  = 10;
+  string banner_media_id     = 11;
+}
+
+message UpdateProfileResponse {
+  bool success = 1;
+}
+
+message GetAllUsersRequest {}
+
+message GetAllUsersResponse {
+  repeated UserInfo users = 1;
+}
+
+message CreateUserReportRequest {
+  string reported_user = 1;
+  string reason = 2;
+}
+message CreateUserReportResponse {
+  string report_id = 1;
+}
+
+message UserReport {
+  string report_id = 1;
+  string reported_user = 2;
+  string reason = 3;
+}
+
+message GetAllUserReportsRequest {}
+
+message GetAllUserReportsResponse {
+  repeated UserReport reports = 1;
+}
+
+message ChangePasswordRequest {
+  string user_id = 1;
+  string new_password = 2;
+}
+
+message ChangePasswordResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+message ExploreUserByNameRequest {
+  string query = 1;
+  int32 threshold = 2;
+  int32 page = 3;
+  int32 size = 4;
+}
+
+message ExploreUserByNameResponse {
+  repeated UserInfo users = 1;
+  int32 total = 2;
+}
+
+
+service UserService {
+  rpc RegisterUser         (RegisterUserRequest)       returns (RegisterUserResponse);
+  rpc IsUsernameUnique     (UsernameValidationRequest) returns (UsernameValidationResponse);
+  rpc GetUserByUsername    (GetUserByUsernameRequest)  returns (GetUserByUsernameResponse);
+  rpc GetUserByEmail    (GetUserByUsernameRequest)  returns (GetUserByUsernameResponse);
+  rpc GetUserById          (GetUserByIdRequest)        returns (GetUserByIdResponse);
+  rpc GetMe                (GetMeRequest)              returns (GetMeResponse);
+  rpc ActivateAccount (GetUserByIdRequest) returns (RegisterUserResponse);
+
+  rpc FollowUser   (FollowUserRequest)     returns (FollowUserResponse);
+  rpc UnfollowUser (UnfollowUserRequest)   returns (UnfollowUserResponse);
+  rpc GetFollowers (GetFollowersRequest)   returns (GetFollowersResponse);
+  rpc GetFollowing (GetFollowingRequest)   returns (GetFollowingResponse);
+  rpc FollowerCount (GetUserByIdRequest) returns (CountResponse);
+  rpc FollowingCount (GetUserByIdRequest) returns (CountResponse);
+  rpc IsFollowed (GetFollowStatusRequest) returns (IsFollowedResponse);
+  rpc BlockUser (BlockUserRequest) returns (BlockUserResponse);
+  rpc UnblockUser (UnblockUserRequest) returns (UnblockUserResponse);
+  rpc IsUserBlocked (IsUserBlockedRequest) returns (IsUserBlockedResponse);
+  rpc RequestPremium (RequestPremiumRequest) returns (RequestPremiumResponse);
+  rpc IsPremium (IsPremiumRequest) returns (RequestPremiumResponse);
+  rpc GetAllPremiumRequests (GetAllPremiumRequestsRequest) returns (GetAllPremiumRequestsResponse);
+  rpc AcceptPremium (AcceptPremiumRequest) returns (AcceptPremiumResponse);
+  rpc RejectPremium (RejectPremiumRequest) returns (RejectPremiumResponse);
+  rpc GetUserByName (GetUserByUsernameRequest) returns (GetUserByNameResponse);
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
+  rpc GetAllUsers (GetAllUsersRequest) returns (GetAllUsersResponse);
+  rpc CreateUserReport (CreateUserReportRequest) returns (CreateUserReportResponse);
+  rpc GetAllUserReports (GetAllUserReportsRequest) returns (GetAllUserReportsResponse);
+  rpc ChangePassword (ChangePasswordRequest) returns (ChangePasswordResponse);
+  rpc ExploreUserByName (ExploreUserByNameRequest) returns (ExploreUserByNameResponse);
+}

@@ -1,0 +1,32 @@
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: "http://localhost:8080/api/v1",
+  withCredentials: true,
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const orig = error.config;
+
+    if (
+      error.response?.status === 401 &&
+      !orig._retry &&
+      !orig.url?.includes("/auth/refresh")
+    ) {
+      orig._retry = true;
+      try {
+        await api.post("/auth/refresh");
+        return api(orig);
+      } catch (refreshErr) {
+        window.location.href = "/login";
+        return Promise.reject(refreshErr);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default api;

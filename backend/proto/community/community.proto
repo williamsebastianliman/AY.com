@@ -1,0 +1,289 @@
+syntax = "proto3";
+
+package community;
+
+option go_package = "github.com/williamsebastianliman/WEB-WS-242/proto/gen/go/proto/community/communitypb;communitypb";
+
+message Empty {}
+
+message Timestamp {
+  int32 year      = 1; 
+  int32 month     = 2;
+  int32 day       = 3;
+  int32 hour      = 4;
+  int32 minute    = 5;
+  int32 second    = 6;
+  string timezone = 7;
+}
+
+message Community {
+  string community_id          = 1;
+  string community_name        = 2;
+  string community_description = 3;
+  string community_rules       = 4;
+  string status                = 5;
+  Timestamp created_at         = 6;
+  string community_logo        = 7;
+  string community_banner      = 8;
+}
+
+message CommunityCategory {
+  string category_id   = 1;
+  string category_name = 2;
+  Timestamp created_at = 3;
+}
+
+message CommunityMember {
+  string community_id = 1;
+  string member_id    = 2;
+  string status       = 3;
+  Timestamp created_at = 4;
+}
+
+message CommunityDetail {
+  string community_id = 1;
+  string category_id  = 2;
+}
+
+message ListCommunitiesRequest {
+  string filter      = 1;
+  string category_id = 2;
+  int32  page        = 3;
+  int32  size        = 4;
+  string user_id = 5;
+}
+
+message ListCommunitiesResponse {
+  repeated Community communities = 1;
+}
+
+message SearchCommunitiesRequest {
+  string keyword = 1;
+  int32  page    = 2;
+  int32  size    = 3;
+}
+
+message SearchCommunitiesResponse {
+  repeated Community communities = 1;
+}
+
+message GetCommunityByIDRequest {
+  string community_id = 1;
+}
+
+message GetCommunityByIDResponse {
+  Community community = 1;
+}
+
+message CreateCommunityRequest {
+  string community_name        = 1;
+  string community_description = 2;
+  string community_rules       = 3;
+  string community_logo        = 4;
+  string community_banner      = 5;
+  string status                = 6;
+  string owner_id =7;
+  repeated string category_ids = 8;
+}
+
+message CreateCommunityResponse {
+  string community_id = 1;
+}
+
+message RequestJoinCommunityRequest {
+  string community_id = 1;
+  string user_id      = 2;
+}
+
+message ListJoinedCommunitiesRequest {
+  string user_id = 1;
+  int32 page = 2;
+  int32 size=3;
+}
+
+message ListJoinedCommunitiesResponse {
+  repeated Community communities = 1;
+}
+
+message ListRequestedCommunitiesRequest {
+  string user_id = 1;
+  int32 page = 2;
+  int32 size=3;
+}
+
+message ListRequestedCommunitiesResponse {
+  repeated Community communities = 1;
+}
+
+message ListModeratedCommunitiesRequest {
+  string user_id = 1;
+}
+
+message ListModeratedCommunitiesResponse {
+  repeated Community communities = 1;
+}
+
+message ListCommunityMembersRequest {
+  string community_id = 1;
+  string role = 2;
+  int32 page = 3;
+  int32 size = 4;
+  string name = 5;
+}
+
+message ListCommunityMembersResponse {
+  repeated CommunityMember members = 1;
+}
+
+message PromoteMemberRequest {
+  string community_id = 1;
+  string user_id      = 2;
+}
+
+message DemoteMemberRequest {
+  string community_id = 1;
+  string user_id      = 2;
+}
+
+message AcceptJoinRequestRequest {
+  string community_id = 1;
+  string user_id      = 2;
+}
+
+message RejectJoinRequestRequest {
+  string community_id = 1;
+  string user_id      = 2;
+}
+
+message CommunityAboutRequest {
+  string community_id = 1;
+}
+
+message CommunityAboutResponse {
+  Community community = 1;
+}
+
+message ListCommunityThreadsRequest {
+  string community_id = 1;
+  int32  page         = 2;
+  int32  size         = 3;
+}
+
+message ListCommunityThreadsResponse {
+  repeated string thread_ids = 1;
+}
+
+message ListCommunityCategoriesRequest {
+  string community_id = 1;
+}
+
+message ListCommunityCategoriesResponse {
+  repeated CommunityCategory categories = 1;
+}
+
+message ListCategoriesResponse {
+  repeated CommunityCategory categories = 1;
+}
+
+message CreateCategoryRequest {
+  string category_name = 1;
+}
+
+message CreateCategoryResponse {
+  string category_id = 1;
+}
+
+message UpdateCategoryRequest {
+  string category_id   = 1;
+  string category_name = 2;
+}
+
+message DeleteCategoryRequest {
+  string category_id = 1;
+}
+
+message AddCommunityCategoryRequest {
+  string community_id = 1;
+  string category_id  = 2;
+}
+
+message RemoveCommunityCategoryRequest {
+  string community_id = 1;
+  string category_id  = 2;
+}
+
+message AcceptRejectCommunityRequest {
+  string community_id = 1;
+}
+
+message CommunityOperationResponse {
+  string message = 1;
+}
+
+message GetTopCommunityMembersRequest {
+  string community_id = 1;
+}
+
+message GetTopCommunityMembersResponse {
+  repeated string member_ids = 1;
+}
+
+message GetUserRoleInCommunityRequest {
+  string community_id = 1;
+  string user_id      = 2;
+}
+
+message GetUserRoleInCommunityResponse {
+  string role = 1;
+}
+
+message CountResponse {
+  int32 count = 1;
+}
+
+message ExploreCommunityByNameRequest {
+  string query = 1;
+  int32 threshold = 2;
+  int32 page = 3;
+  int32 size = 4;
+}
+
+message ExploreCommunityByNameResponse {
+  repeated Community communities = 1;
+  int32 total = 2;
+}
+
+
+service CommunityService {
+  rpc ListCommunities         (ListCommunitiesRequest)         returns (ListCommunitiesResponse);
+  rpc SearchCommunities       (SearchCommunitiesRequest)       returns (SearchCommunitiesResponse);
+  rpc GetCommunityByID        (GetCommunityByIDRequest)        returns (GetCommunityByIDResponse);
+  rpc CreateCommunity         (CreateCommunityRequest)         returns (CreateCommunityResponse);
+  rpc RequestJoinCommunity    (RequestJoinCommunityRequest)    returns (Empty);
+  rpc ListJoinedCommunities   (ListJoinedCommunitiesRequest)   returns (ListJoinedCommunitiesResponse);
+  rpc ListRequestedCommunities(ListRequestedCommunitiesRequest)returns (ListRequestedCommunitiesResponse);
+  rpc ListModeratedCommunities(ListModeratedCommunitiesRequest)returns (ListModeratedCommunitiesResponse);
+  rpc ListCommunityMembers    (ListCommunityMembersRequest)    returns (ListCommunityMembersResponse);
+  rpc ListPendingCommunities  (Empty) returns (ListRequestedCommunitiesResponse);
+  rpc PromoteMember           (PromoteMemberRequest)           returns (Empty);
+  rpc DemoteMember            (DemoteMemberRequest)            returns (Empty);
+  rpc AcceptJoinRequest       (AcceptJoinRequestRequest)       returns (Empty);
+  rpc RejectJoinRequest       (RejectJoinRequestRequest)       returns (Empty);
+  rpc CommunityAbout          (CommunityAboutRequest)          returns (CommunityAboutResponse);
+
+  rpc ListCommunityCategories (ListCommunityCategoriesRequest) returns (ListCommunityCategoriesResponse);
+
+  rpc ListCategories         (Empty)                       returns (ListCategoriesResponse);
+  rpc CreateCategory         (CreateCategoryRequest)       returns (CreateCategoryResponse);
+  rpc UpdateCategory         (UpdateCategoryRequest)       returns (Empty);
+  rpc DeleteCategory         (DeleteCategoryRequest)       returns (Empty);
+  rpc AddCommunityCategory   (AddCommunityCategoryRequest) returns (Empty);
+  rpc RemoveCommunityCategory(RemoveCommunityCategoryRequest) returns (Empty);
+
+  rpc AcceptCommunityCreation (AcceptRejectCommunityRequest) returns (CommunityOperationResponse);
+  rpc RejectCommunityCreation (AcceptRejectCommunityRequest) returns (CommunityOperationResponse);
+  rpc GetTopCommunityMembers(GetTopCommunityMembersRequest) returns (GetTopCommunityMembersResponse);
+  rpc GetUserRoleInCommunity(GetUserRoleInCommunityRequest) returns (GetUserRoleInCommunityResponse);
+  rpc GetCommunityMemberCount (GetCommunityByIDRequest) returns (CountResponse);
+  rpc ExploreCommunityByName (ExploreCommunityByNameRequest) returns (ExploreCommunityByNameResponse);
+}

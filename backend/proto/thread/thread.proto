@@ -1,0 +1,349 @@
+syntax = "proto3";
+
+package thread;
+
+option go_package = "github.com/williamsebastianliman/WEB-WS-242/proto/gen/go/proto/thread/threadpb;threadpb";
+
+message Empty {}
+
+message Timestamp {
+  int32 year      = 1; 
+  int32 month     = 2;
+  int32 day       = 3;
+  int32 hour      = 4;
+  int32 minute    = 5;
+  int32 second    = 6;
+  string timezone = 7;
+}
+
+message Thread {
+  string id            = 1;
+  string user_id       = 2;
+  string community_id  = 3;
+  string content       = 4;
+
+  int64 like_count     = 5;
+  int64 comment_count  = 6;
+  int64 share_count    = 7;
+  int64 view_count     = 8;
+
+  string repost_id = 9;
+  bool is_pinned = 10;
+
+  Timestamp created_at = 11;
+  Timestamp updated_at = 12;
+}
+
+message CreateThreadRequest {
+  string user_id      = 1;
+  string content      = 2;
+  string community_id = 3;
+  string parent_id = 4;
+}
+
+message RepostThreadRequest {
+  string user_id      = 1;
+  string content      = 2;
+  string community_id = 3;
+  string repost_id = 4;
+  string parent_id = 5;
+}
+
+message RepliesGroup{
+  Thread parent_thread = 1;
+  repeated Thread replies = 2;
+}
+
+message GetRepliesByIdResponse{
+  repeated RepliesGroup user_replies = 1;
+}
+
+message CreateThreadResponse {
+  string id = 1;
+}
+
+message GetThreadByIDRequest {
+  string id = 1;
+}
+
+message GetThreadByIDResponse {
+  Thread thread = 1;
+}
+
+message UpdateThreadRequest {
+  string id           = 1;
+  string content      = 2;
+  string community_id = 3;
+}
+
+message DeleteThreadRequest {
+  string id = 1;
+}
+
+message ListThreadsRequest {
+  int32 page = 1;
+  int32 size = 2;
+}
+
+message GroupedMediaResponse{
+  Thread thread = 1;
+  repeated ThreadMedia media_list = 2; 
+}
+
+message GetMediaByUserResponse{
+  repeated GroupedMediaResponse groups = 1;
+}
+
+message GetMediaByCommunityResponse{
+  repeated GroupedMediaResponse groups = 1;
+}
+
+message ListRepliesRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string parent_id = 3;
+}
+
+message ListThreadsResponse {
+  repeated Thread threads = 1;
+}
+
+message ListByUserRequest {
+  string user_id = 1;
+  int32 page     = 2;
+  int32 size     = 3;
+  string query = 4;
+}
+
+message ListByCommunityRequest {
+  string community_id = 1;
+  int32 page          = 2;
+  int32 size          = 3;
+}
+
+message SearchThreadsRequest {
+  string keyword = 1;
+  int32 page     = 2;
+  int32 size     = 3;
+}
+
+message SearchThreadsResponse {
+  repeated Thread threads = 1;
+}
+
+message IncrementRequest {
+  string id = 1;
+}
+
+message CountThreadsResponse {
+  int64 count = 1;
+}
+
+// for user/thread operations
+message ThreadUserRequest {
+  string thread_id = 1;
+  string user_id   = 2;
+}
+
+message ThreadRequest {
+  string thread_id = 1;
+}
+
+message ThreadMediaRequest {
+  string thread_id = 1;
+  string media_id  = 2;
+}
+
+message ThreadMedia {
+  string thread_id  = 1;
+  string image_url  = 2;
+  string extension = 3;
+  Timestamp created_at = 4;
+}
+
+message ListThreadMediaResponse {
+  repeated ThreadMedia media = 1;
+}
+
+message ExistsResponse {
+  bool exists = 1;
+}
+
+message Category {
+  string category_id = 1;
+  string category_name = 2;
+}
+
+message CreateCategoryRequest {
+  string category_name = 1;
+}
+
+message CreateCategoryResponse {
+  string category_id = 1;
+}
+
+message ListCategoriesResponse {
+  repeated Category categories = 1;
+}
+
+message ListThreadsByCategoryRequest {
+  string category_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+}
+
+message ListThreadsByCommunityRequest {
+  string community_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+}
+
+message ListThreadsByCommunityResponse {
+  repeated Thread threads = 1;
+}
+
+message GetMediaByCommunityRequest {
+  string community_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+}
+
+message UpdateCategoryRequest {
+  string category_id = 1;
+  string category_name = 2;
+}
+
+message DeleteCategoryRequest {
+  string category_id = 1;
+}
+
+message ThreadHashtag {
+  string thread_id = 1;
+  string hashtag_name = 2;
+  Timestamp created_at = 3;
+}
+
+message GetThreadsByHashtagRequest {
+  string hashtag_name = 1;
+  int32 page = 2;
+  int32 size = 3;
+}
+
+message GetThreadsByHashtagResponse {
+  repeated Thread threads = 1;
+}
+
+message TopHashtag {
+  string hashtag_name = 1;
+  int64 count = 2;
+}
+
+message GetTopHashtagsRequest {
+  int32 limit = 1;
+}
+
+message GetTopHashtagsResponse {
+  repeated TopHashtag hashtags = 1;
+}
+
+message SearchThreadsByContentRequest {
+  string keyword = 1;
+  int32 page     = 2;
+  int32 size     = 3;
+  int32 threshold = 4;
+}
+
+message SearchThreadsByContentResponse {
+  repeated Thread threads = 1;
+  int32 total = 2;
+}
+
+message SearchMediaByContentRequest {
+  string keyword   = 1;
+  int32 threshold  = 2;
+  int32 page       = 3;
+  int32 size       = 4;
+}
+
+message SearchMediaByContentResponse {
+  repeated GroupedMediaResponse groups = 1;
+  int32 total = 2;
+}
+
+service ThreadService {
+  rpc CreateThread           (CreateThreadRequest)    returns (CreateThreadResponse);
+  rpc GetThreadByID          (GetThreadByIDRequest)   returns (GetThreadByIDResponse);
+  rpc UpdateThread           (UpdateThreadRequest)    returns (Empty);
+  rpc DeleteThread           (DeleteThreadRequest)    returns (Empty);
+
+  rpc ListThreads            (ListThreadsRequest)     returns (ListThreadsResponse);
+  rpc ListThreadsByUserFollower(ListByUserRequest) returns (ListThreadsResponse);
+  rpc ListThreadsByUser      (ListByUserRequest)      returns (ListThreadsResponse);
+  rpc ListThreadsByCommunity (ListByCommunityRequest) returns (ListThreadsResponse);
+  rpc SearchThreads          (SearchThreadsRequest)   returns (SearchThreadsResponse);
+
+  rpc IncrementView          (IncrementRequest)       returns (Empty);
+  rpc IncrementLike          (IncrementRequest)       returns (Empty);
+  rpc IncrementComment       (IncrementRequest)       returns (Empty);
+  rpc IncrementShare         (IncrementRequest)       returns (Empty);
+
+  rpc CountThreads           (Empty)                  returns (CountThreadsResponse);
+
+  // Likes
+  rpc LikeThread             (ThreadUserRequest)      returns (Empty);
+  rpc UnlikeThread           (ThreadUserRequest)      returns (Empty);
+  rpc CountThreadLikes       (ThreadRequest)          returns (CountThreadsResponse);
+  rpc ListThreadsByUserLike  (ListByUserRequest)      returns (ListThreadsResponse);
+  rpc ListThreadsByUserBookmark (ListByUserRequest)   returns (ListThreadsResponse);
+  rpc ListReplies (ListRepliesRequest) returns(ListThreadsResponse);
+
+  rpc HasLikedThread         (ThreadUserRequest)      returns (ExistsResponse);
+
+  // Bookmarks
+  rpc BookmarkThread         (ThreadUserRequest)      returns (Empty);
+  rpc UnbookmarkThread       (ThreadUserRequest)      returns (Empty);
+  rpc CountThreadBookmarks   (ThreadRequest)          returns (CountThreadsResponse);
+
+  rpc HasBookmarkedThread    (ThreadUserRequest)      returns (ExistsResponse);
+
+  rpc CountThreadReplies     (ThreadRequest)          returns (CountThreadsResponse);
+  // Media attachments
+  rpc ListThreadMedia        (ThreadRequest)          returns (ListThreadMediaResponse);
+  rpc AddThreadMedia         (ThreadMediaRequest)     returns (Empty);
+  rpc RemoveThreadMedia      (ThreadMediaRequest)     returns (Empty);
+  rpc CountThreadMedia       (ThreadRequest)          returns (CountThreadsResponse);
+
+  // Reply
+  rpc ListRepliesByUser (GetThreadByIDRequest) returns (GetRepliesByIdResponse);
+  rpc GetMediaByUser (GetThreadByIDRequest) returns (GetMediaByUserResponse);
+  rpc CreateCategory (CreateCategoryRequest) returns (CreateCategoryResponse);
+  rpc ListCategories (Empty) returns (ListCategoriesResponse);
+  rpc ListThreadsByCategory (ListThreadsByCategoryRequest) returns (ListThreadsResponse);
+
+  //Community Thread
+  rpc ListThreadsByCommunityByLike(ListThreadsByCommunityRequest) returns (ListThreadsByCommunityResponse);
+  rpc ListThreadsByCommunityByTime(ListThreadsByCommunityRequest) returns (ListThreadsByCommunityResponse);
+  rpc GetMediaByCommunity(GetMediaByCommunityRequest) returns (GetMediaByCommunityResponse);
+  rpc CreateRepost (RepostThreadRequest) returns (CreateThreadResponse);
+
+  //Repost 
+  rpc CountRepost(ThreadRequest) returns (CountThreadsResponse);
+  rpc HasReposted(ThreadUserRequest) returns (ExistsResponse);
+
+  //Pin 
+  rpc PinThread (ThreadRequest) returns (Empty);
+
+  //Thread Category
+  rpc UpdateCategory (UpdateCategoryRequest) returns (Empty);
+  rpc DeleteCategory (DeleteCategoryRequest) returns (Empty);
+
+  //Thread Hashtag
+  rpc GetThreadsByHashtag (GetThreadsByHashtagRequest) returns (GetThreadsByHashtagResponse);
+  rpc GetTopHashtags (GetTopHashtagsRequest) returns (GetTopHashtagsResponse);
+
+  //SearchThreads
+  rpc SearchThreadsByContent (SearchThreadsByContentRequest) returns (SearchThreadsByContentResponse);
+  
+  //Explore Media
+  rpc SearchMediaByContent (SearchMediaByContentRequest) returns (SearchMediaByContentResponse);
+}
